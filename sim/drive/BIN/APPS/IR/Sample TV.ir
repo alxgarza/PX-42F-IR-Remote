@@ -1,0 +1,50 @@
+Filetype: IR signals file
+Version: 1
+# A sample remote: Flipper's format, plus "button:" (the key: R0C5 = XEQ)
+# and "label:" (what the key shows). Codes from an NEC TV.
+#
+name: Power
+button: R0C5
+protocol: NECext
+address: 02 7D 00 00
+command: 9F 60 00 00
+#
+name: Input
+button: R2C0
+protocol: NECext
+address: 02 7D 00 00
+command: 8F 70 00 00
+#
+name: Mute
+button: R2C4
+protocol: NECext
+address: 02 7D 00 00
+command: 8B 74 00 00
+#
+name: Channel Up
+label: Ch+
+button: R3C0
+protocol: NECext
+address: 02 7D 00 00
+command: 87 78 00 00
+#
+name: Channel Down
+label: Ch-
+button: R4C0
+protocol: NECext
+address: 02 7D 00 00
+command: 86 79 00 00
+#
+name: Volume Up
+label: Vol+
+button: R6C4
+protocol: NECext
+address: 02 7D 00 00
+command: 85 7A 00 00
+#
+name: Volume Down
+label: Vol-
+button: R5C4
+protocol: NECext
+address: 02 7D 00 00
+command: 84 7B 00 00

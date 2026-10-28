@@ -1,0 +1,240 @@
+# PX-42F remote control: a Samsung TV.
+#
+# Copy this file to the BIN/APPS/IR folder on the calculator's drive (USB
+# Drive mode), then choose it in Settings > Games & Apps > Apps > IR. ON goes
+# back to the menu.
+# To make a remote for another device, copy this file, rename it, and change
+# the codes. Lines starting with # are notes and are ignored.
+#
+# Each key is one entry:
+#   name:     what the code does (shown at the top when it's sent)
+#   label:    what the key shows on the screen (5 letters fit; 6 in the
+#             rows from Up/7/8/9 down; 10 on ENTER)
+#   button:   which key: R + row (0-6, from the top), C + column (0-5, from
+#             the left)
+#   protocol, address, command: the code, as in Flipper Zero .ir files
+#             (Flipper-IRDB has codes for most TVs, players and amplifiers)
+#
+# The keys, and what this file puts on them:
+#
+#        C0       C1       C2       C3       C4       C5
+#  R0    Sigma+   1/x      sqrt     LOG      LN       XEQ
+#        Power    Input    Menu     Home     Guide    Info
+#  R1    STO      RCL      Rdn      SIN      COS      TAN
+#        Back     Left     Up       Down     Right    Exit
+#  R2    ENTER    x<>y     +/-      E        <-       
+#        OK       Mute     -        -        -
+#  R3    Up       7        8        9        /
+#        Ch+      7        8        9        -
+#  R4    Down     4        5        6        x
+#        Ch-      4        5        6        -
+#  R5    SHIFT    1        2        3        -
+#        -        1        2        3        Vol-
+#  R6    ON       0        .        R/S      +
+#        (Calc)   0        PreCh    -        Vol+
+#
+# A key with no entry stays blank and does nothing. R6C0 (ON) can't be used.
+# SHIFT is left free: SHIFT and - held together save a screenshot.
+#
+name: Power
+label: Power
+button: R0C0
+protocol: Samsung32
+address: 07 00 00 00
+command: 02 00 00 00
+#
+name: Source
+label: Input
+button: R0C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 01 00 00 00
+#
+name: Menu
+label: Menu
+button: R0C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 1A 00 00 00
+#
+name: Smart Hub
+label: Home
+button: R0C3
+protocol: Samsung32
+address: 07 00 00 00
+command: 79 00 00 00
+#
+name: Guide
+label: Guide
+button: R0C4
+protocol: Samsung32
+address: 07 00 00 00
+command: 4F 00 00 00
+#
+name: Info
+label: Info
+button: R0C5
+protocol: Samsung32
+address: 07 00 00 00
+command: 1F 00 00 00
+#
+name: Return
+label: Back
+button: R1C0
+protocol: Samsung32
+address: 07 00 00 00
+command: 58 00 00 00
+#
+name: Left
+label: Left
+button: R1C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 65 00 00 00
+#
+name: Up
+label: Up
+button: R1C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 60 00 00 00
+#
+name: Down
+label: Down
+button: R1C3
+protocol: Samsung32
+address: 07 00 00 00
+command: 61 00 00 00
+#
+name: Right
+label: Right
+button: R1C4
+protocol: Samsung32
+address: 07 00 00 00
+command: 62 00 00 00
+#
+name: Exit
+label: Exit
+button: R1C5
+protocol: Samsung32
+address: 07 00 00 00
+command: 2D 00 00 00
+#
+name: OK
+label: OK
+button: R2C0
+protocol: Samsung32
+address: 07 00 00 00
+command: 68 00 00 00
+#
+name: Mute
+label: Mute
+button: R2C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 0F 00 00 00
+#
+name: Channel Up
+label: Ch+
+button: R3C0
+protocol: Samsung32
+address: 07 00 00 00
+command: 12 00 00 00
+#
+name: 7
+label: 7
+button: R3C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 0C 00 00 00
+#
+name: 8
+label: 8
+button: R3C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 0D 00 00 00
+#
+name: 9
+label: 9
+button: R3C3
+protocol: Samsung32
+address: 07 00 00 00
+command: 0E 00 00 00
+#
+name: Channel Down
+label: Ch-
+button: R4C0
+protocol: Samsung32
+address: 07 00 00 00
+command: 10 00 00 00
+#
+name: 4
+label: 4
+button: R4C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 08 00 00 00
+#
+name: 5
+label: 5
+button: R4C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 09 00 00 00
+#
+name: 6
+label: 6
+button: R4C3
+protocol: Samsung32
+address: 07 00 00 00
+command: 0A 00 00 00
+#
+name: 1
+label: 1
+button: R5C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 04 00 00 00
+#
+name: 2
+label: 2
+button: R5C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 05 00 00 00
+#
+name: 3
+label: 3
+button: R5C3
+protocol: Samsung32
+address: 07 00 00 00
+command: 06 00 00 00
+#
+name: Volume Down
+label: Vol-
+button: R5C4
+protocol: Samsung32
+address: 07 00 00 00
+command: 0B 00 00 00
+#
+name: 0
+label: 0
+button: R6C1
+protocol: Samsung32
+address: 07 00 00 00
+command: 11 00 00 00
+#
+name: Previous Channel
+label: PreCh
+button: R6C2
+protocol: Samsung32
+address: 07 00 00 00
+command: 13 00 00 00
+#
+name: Volume Up
+label: Vol+
+button: R6C4
+protocol: Samsung32
+address: 07 00 00 00
+command: 07 00 00 00
