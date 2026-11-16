@@ -16,20 +16,22 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.4 system-ui, sans-serif; }
 main { display: flex; flex-wrap: wrap; gap: 24px; padding: 20px 16px; max-width: 1280px; margin: 0 auto; }
-.device { flex: 1 1 560px; max-width: 780px; background: var(--body); border-radius: 18px; padding: 20px; }
-.lcd { display: block; width: 100%; image-rendering: pixelated; background: #c5cfb2; border: 4px solid #111; border-radius: 4px; }
+/* The calculator's own overlay (sim/overlay.png, 1087 x 1914, its corners
+   rounded by 27 pixels): the screen
+   and the keys placed over it in its pixels, as percentages. */
+.device { flex: 0 1 460px; min-width: 0; position: relative; align-self: flex-start; border-radius: 2.48% / 1.41%; overflow: hidden; }
+.device img { display: block; width: 100%; height: auto; user-select: none; -webkit-user-drag: none; }
+.lcd { position: absolute; image-rendering: pixelated; background: #c5cfb2; }
 .lcd.off { filter: grayscale(1) brightness(0.7); }
-.keys { display: grid; grid-template-columns: repeat(30, 1fr); gap: 8px; margin-top: 18px; }
 .k {
-  grid-column: span 6; min-height: 54px; border: 0; border-radius: 7px; padding: 6px 2px 4px;
-  background: var(--key); color: var(--key-fg); font: inherit; cursor: pointer; touch-action: none; user-select: none;
-  box-shadow: 0 3px 0 #111;
+  position: absolute; border: 0; padding: 0; background: transparent;
+  cursor: pointer; touch-action: none; user-select: none;
 }
-.k.narrow { grid-column: span 5; }
-.k b { display: block; font-size: 0.98rem; font-weight: 600; }
-.k span { display: block; font: 0.68rem ui-monospace, Menlo, Consolas, monospace; opacity: 0.65; }
-.k.named b { color: #f0a868; }
-.k.down { background: var(--key-down); transform: translateY(3px); box-shadow: none; }
+.k:focus-visible { outline: 2px solid var(--accent); border-radius: 8px; }
+/* Inside each key's gold ring, the key's colour: it takes no clicks, its key does. */
+.oval { position: absolute; border-radius: 9999px; pointer-events: none; }
+/* Pressed: a shadow inside the edge, the colour kept. */
+.oval.down { box-shadow: inset 0 3px 7px rgb(0 0 0 / 0.55); }
 .side { flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
 .bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .bar .state { margin-left: auto; color: var(--muted); font-size: 0.9rem; }
@@ -52,9 +54,9 @@ kbd { font: 0.8rem ui-monospace, Menlo, Consolas, monospace; border: 1px solid v
 </head>
 <body>
 <main>
-  <section class="device" aria-label="The calculator">
+  <section class="device" id="device" aria-label="The calculator">
+    <img src="/overlay.png" alt="" draggable="false">
     <canvas id="lcd" class="lcd" width="250" height="122"></canvas>
-    <div class="keys" id="keys"></div>
   </section>
 
   <section class="side">
@@ -104,17 +106,50 @@ const lcd = $('lcd'), ctx = lcd.getContext('2d'), logEl = $('log'), stateEl = $(
 const caps = {};
 let info = null, frame = null, chain = Promise.resolve();
 
+/* Where things are on the overlay, in its pixels: the screen's window, the
+   two rows of six keys and the five rows of five (their frames), and the
+   ovals (all 126 x 79: their centres across, their tops down). */
+const OVERLAY = { w: 1087, h: 1914 };
+const SCREEN = [97, 126, 989, 558];
+const SIX_X = [71, 230, 388, 545, 702, 858, 1015], SIX_Y = [[600, 772], [785, 958]];
+const FIVE_X = [56, 248, 444, 640, 837, 1030];
+const FIVE_Y = [[966, 1148], [1151, 1333], [1336, 1519], [1521, 1704], [1707, 1889]];
+const OVAL_W = 126, OVAL_H = 79, OVAL_TOP = [647, 833, 1018, 1203, 1388, 1574, 1759];
+const OVAL_SIX = [151, 308, 466.5, 624, 781, 936], OVAL_FIVE = [151, 347, 543.5, 740, 936];
+/* The keys' colours (the overlay's ovals are left white to be filled), inside
+   the 5-pixel ring: black, gray, white, and SHIFT's yellow. */
+const RING = 5, BLACK = '#030202', GRAY = '#808080', WHITE = '#f6fbfe', YELLOW = '#f2bf0d';
+const KEY_COLOR = [
+  Array(6).fill(BLACK), Array(6).fill(BLACK), Array(5).fill(GRAY),
+  [BLACK, WHITE, WHITE, WHITE, GRAY], [BLACK, WHITE, WHITE, WHITE, GRAY],
+  [YELLOW, WHITE, WHITE, WHITE, GRAY], [BLACK, WHITE, WHITE, WHITE, GRAY],
+];
+function place(el, x0, y0, x1, y1) {
+  Object.assign(el.style, {
+    left: `${100 * x0 / OVERLAY.w}%`, top: `${100 * y0 / OVERLAY.h}%`,
+    width: `${100 * (x1 - x0) / OVERLAY.w}%`, height: `${100 * (y1 - y0) / OVERLAY.h}%`,
+  });
+}
+place(lcd, ...SCREEN);
+
 /* The keys: named R<row>C<col>, ON for the ON key. */
-ROWS.forEach((row, r) => row.forEach(([label, note], c) => {
+ROWS.forEach((row, r) => row.forEach(([label], c) => {
   const name = r === 6 && c === 0 ? 'ON' : `R${r}C${c}`;
   const b = document.createElement('button');
-  b.className = 'k' + (r < 2 ? ' narrow' : '') + (note && note !== 'quits' ? ' named' : '');
-  b.innerHTML = `<b></b><span>${name}</span>`;
-  b.firstChild.textContent = label;
+  b.className = 'k';
+  b.title = `${label} (${name})`;
+  b.setAttribute('aria-label', label);
+  if (r < 2) place(b, SIX_X[c] + 3, SIX_Y[r][0], SIX_X[c + 1] - 3, SIX_Y[r][1]);
+  else place(b, FIVE_X[c] + 3, FIVE_Y[r - 2][0], FIVE_X[c + 1] - 3, FIVE_Y[r - 2][1]);
   b.addEventListener('pointerdown', (e) => { b.setPointerCapture(e.pointerId); press(name); });
   b.addEventListener('pointerup', () => release(name));
   b.addEventListener('pointercancel', () => release(name));
-  $('keys').append(b);
+  const oval = document.createElement('span'), ox = (r < 2 ? OVAL_SIX : OVAL_FIVE)[c];
+  oval.className = 'oval';
+  place(oval, ox - OVAL_W / 2 + RING, OVAL_TOP[r] + RING, ox + OVAL_W / 2 - RING, OVAL_TOP[r] + OVAL_H - RING);
+  oval.style.background = KEY_COLOR[r][c];
+  b.oval = oval;
+  $('device').append(b, oval);
   caps[name] = b;
 }));
 
@@ -136,13 +171,13 @@ const held = new Set();
 function press(name) {
   if (held.has(name)) return;
   held.add(name);
-  caps[name].classList.add('down');
+  caps[name].oval.classList.add('down');
   send('/input', `down ${name}\n`);
   if (recording) record(name);
 }
 function release(name) {
   if (!held.delete(name)) return;
-  caps[name].classList.remove('down');
+  caps[name].oval.classList.remove('down');
   send('/input', `up ${name}\n`);
 }
 

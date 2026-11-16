@@ -172,10 +172,11 @@ class Handler(http.server.BaseHTTPRequestHandler):
             self.events()
         elif self.path.startswith('/drive/'):
             self.drive_file(urllib.parse.unquote(self.path[len('/drive/'):]))
-        elif self.path == '/':
-            page = open(os.path.join(HERE, 'live.html'), 'rb').read()
+        elif self.path in ('/', '/overlay.png'):
+            name, kind = ('live.html', 'text/html; charset=utf-8') if self.path == '/' else ('overlay.png', 'image/png')
+            page = open(os.path.join(HERE, name), 'rb').read()
             self.send_response(200)
-            self.send_header('Content-Type', 'text/html; charset=utf-8')
+            self.send_header('Content-Type', kind)
             self.send_header('Content-Length', str(len(page)))
             self.end_headers()
             self.wfile.write(page)
